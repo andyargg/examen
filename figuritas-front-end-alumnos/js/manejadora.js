@@ -19,6 +19,8 @@ var banderas = {
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelector("#tab-formulario .card-footer .btn-success").addEventListener("click", guardar);
     document.querySelector("#tab-formulario .card-footer .btn-secondary").addEventListener("click", limpiar);
+    document.getElementById("btnModificar").addEventListener("click", modificar);
+    document.getElementById("btnEliminar").addEventListener("click", eliminar);
     obtenerFiguritas();
 });
 
@@ -75,7 +77,6 @@ function crearCard(fig) {
 }
 
 function guardar() {
-    console.log("guardar llamado");
     if (!validar(true)) return;
     var formData = new FormData();
     formData.append("nombre", document.getElementById("txtNombre").value.trim());
@@ -98,15 +99,84 @@ function guardar() {
 }
 
 function seleccionar(id) {
+    var fig = null;
+    for (var i = 0; i < figuritas.length; i++) {
+        if (figuritas[i]._id == id) {
+            fig = figuritas[i];
+            break;
+        }
+    }
+    idSeleccionado = id;
+    document.getElementById("txtId").value = fig._id;
+    document.getElementById("txtNombre").value = fig.nombre;
+    document.getElementById("selectPais").value = fig.pais;
+    document.getElementById("txtPrecio").value = fig.precio;
+    document.getElementById("previewImagen").src = "https://figuritas-api.onrender.com/" + fig.imagen;
+    document.getElementById("badgeModo").textContent = "Modo: Modificación";
+    document.getElementById("requiredImg").style.display = "none";
+    document.getElementById("btnModificar").disabled = false;
+    document.getElementById("btnEliminar").disabled = false;
+    mostrarFiguritas();
+    var tabEl = document.querySelector('[data-bs-target="#tab-formulario"]');
+    new bootstrap.Tab(tabEl).show();
 }
 
 function modificar() {
+    if (!idSeleccionado) return;
+    if (!validar(false)) return;
+    var formData = new FormData();
+    formData.append("nombre", document.getElementById("txtNombre").value.trim());
+    formData.append("pais", document.getElementById("selectPais").value);
+    formData.append("precio", document.getElementById("txtPrecio").value);
+    var imagen = document.getElementById("fileImagen").files[0];
+    if (imagen) formData.append("imagen", imagen);
+    mostrarSpinner();
+    fetch(URL_API + "/" + idSeleccionado, { method: "PUT", body: formData })
+        .then(function(res) { return res.json(); })
+        .then(function() {
+            ocultarSpinner();
+            alerta("Figurita modificada!!", "success");
+            limpiar();
+            obtenerFiguritas();
+        })
+        .catch(function() {
+            ocultarSpinner();
+            alerta("Error al quere modificar", "danger");
+        });
 }
 
 function eliminar() {
+    if (!idSeleccionado) return;
+    if (!confirm("¿Quiere eliminar esta figurita?")) return;
+    mostrarSpinner();
+    fetch(URL_API + "/" + idSeleccionado, { method: "DELETE" })
+        .then(function(res) { return res.json(); })
+        .then(function() {
+            ocultarSpinner();
+            alerta("Figurita eliminada!!", "success");
+            limpiar();
+            obtenerFiguritas();
+        })
+        .catch(function() {
+            ocultarSpinner();
+            alerta("Error al eliminar la figurita", "danger");
+        });
 }
 
 function eliminarDirecto(id) {
+    if (!confirm("¿Quiere eliminar esta figurita?")) return;
+    mostrarSpinner();
+    fetch(URL_API + "/" + id, { method: "DELETE" })
+        .then(function(res) { return res.json(); })
+        .then(function() {
+            ocultarSpinner();
+            alerta("Figurita eliminada", "success");
+            obtenerFiguritas();
+        })
+        .catch(function() {
+            ocultarSpinner();
+            alerta("Error al eliminar", "danger");
+        });
 }
 
 function validar(esAlta) {
