@@ -27,14 +27,12 @@
   /* height, object-fit */
 }
 
-/* TODO: Campo válido (verde) */
 .is-valid {
-  /* border-color verde */
+  background-color: #f0fff4;
 }
 
-/* TODO: Campo inválido (rojo) */
 .is-invalid {
-  /* border-color rojo */
+  background-color: #fff5f5;
 }
 
 /* TODO: Animación de alertas */

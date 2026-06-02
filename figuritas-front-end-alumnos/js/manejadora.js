@@ -21,6 +21,13 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelector("#tab-formulario .card-footer .btn-secondary").addEventListener("click", limpiar);
     document.getElementById("btnModificar").addEventListener("click", modificar);
     document.getElementById("btnEliminar").addEventListener("click", eliminar);
+    document.getElementById("contenedorFiguritas").addEventListener("click", function(e) {
+        if (!e.target.closest("button") && idSeleccionado) {
+            limpiar();
+        }
+    });
+    document.getElementById("fileImagen").addEventListener("change", preview);
+    limpiar();
     obtenerFiguritas();
 });
 
@@ -96,6 +103,7 @@ function guardar() {
             ocultarSpinner();
             alerta("Error al guardar", "danger");
         });
+    console.log("guardar")
 }
 
 function seleccionar(id) {
@@ -180,15 +188,51 @@ function eliminarDirecto(id) {
 }
 
 function validar(esAlta) {
+    var valido = true;
     var nombre = document.getElementById("txtNombre").value.trim();
     var pais = document.getElementById("selectPais").value;
     var precio = Number(document.getElementById("txtPrecio").value);
     var imagen = document.getElementById("fileImagen").files[0];
-    if (nombre.length < NOMBRE_MIN || nombre.length > NOMBRE_MAX) return false;
-    if (!pais) return false;
-    if (!precio || precio < PRECIO_MIN || precio > PRECIO_MAX) return false;
-    if (esAlta && !imagen) return false;
-    return true;
+
+    if (nombre.length >= NOMBRE_MIN && nombre.length <= NOMBRE_MAX) {
+        document.getElementById("txtNombre").classList.remove("is-invalid");
+        document.getElementById("txtNombre").classList.add("is-valid");
+    } else {
+        document.getElementById("txtNombre").classList.remove("is-valid");
+        document.getElementById("txtNombre").classList.add("is-invalid");
+        valido = false;
+    }
+
+    if (pais) {
+        document.getElementById("selectPais").classList.remove("is-invalid");
+        document.getElementById("selectPais").classList.add("is-valid");
+    } else {
+        document.getElementById("selectPais").classList.remove("is-valid");
+        document.getElementById("selectPais").classList.add("is-invalid");
+        valido = false;
+    }
+
+    if (precio >= PRECIO_MIN && precio <= PRECIO_MAX) {
+        document.getElementById("txtPrecio").classList.remove("is-invalid");
+        document.getElementById("txtPrecio").classList.add("is-valid");
+    } else {
+        document.getElementById("txtPrecio").classList.remove("is-valid");
+        document.getElementById("txtPrecio").classList.add("is-invalid");
+        valido = false;
+    }
+
+    if (esAlta) {
+        if (imagen && FORMATOS_IMAGEN.includes(imagen.type) && imagen.size <= MAX_IMAGEN_SIZE) {
+            document.getElementById("fileImagen").classList.remove("is-invalid");
+            document.getElementById("fileImagen").classList.add("is-valid");
+        } else {
+            document.getElementById("fileImagen").classList.remove("is-valid");
+            document.getElementById("fileImagen").classList.add("is-invalid");
+            valido = false;
+        }
+    }
+
+    return valido;
 }
 
 function limpiar() {
@@ -200,9 +244,27 @@ function limpiar() {
     document.getElementById("btnModificar").disabled = true;
     document.getElementById("btnEliminar").disabled = true;
     idSeleccionado = null;
+    var campos = ["txtNombre", "selectPais", "txtPrecio", "fileImagen"];
+    for (var i = 0; i < campos.length; i++) {
+        document.getElementById(campos[i]).classList.remove("is-valid", "is-invalid");
+    }
 }
 
 function preview() {
+    var archivo = document.getElementById("fileImagen").files[0];
+    if (!archivo) return;
+    if (!FORMATOS_IMAGEN.includes(archivo.type) || archivo.size > MAX_IMAGEN_SIZE) {
+        document.getElementById("fileImagen").classList.add("is-invalid");
+        document.getElementById("fileImagen").classList.remove("is-valid");
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById("previewImagen").src = e.target.result;
+    };
+    reader.readAsDataURL(archivo);
+    document.getElementById("fileImagen").classList.remove("is-invalid");
+    document.getElementById("fileImagen").classList.add("is-valid");
 }
 
 function mostrarSpinner() {
