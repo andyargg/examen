@@ -36,6 +36,9 @@ document.addEventListener("DOMContentLoaded", function() {
     var btnsPag = document.querySelectorAll("#tab-listado .justify-content-center .btn-outline-secondary");
     btnsPag[0].addEventListener("click", function() { cambiarPagina(-1); });
     btnsPag[1].addEventListener("click", function() { cambiarPagina(1); });
+    document.querySelector("#tab-estadisticas .btn-primary").addEventListener("click", estadisticas);
+    document.querySelector("#tab-estadisticas .btn-outline-primary").addEventListener("click", exportarCSV);
+    cargarTemaGuardado();
     limpiar();
     obtenerFiguritas();
 });
@@ -348,9 +351,41 @@ function actualizarBadge() {
 }
 
 function estadisticas() {
+    var total = figuritas.length;
+
+    var conteo = {};
+    figuritas.map(function(f) { return f.pais; }).forEach(function(p) {
+        conteo[p] = (conteo[p] || 0) + 1;
+    });
+    var paisModa = Object.keys(conteo).reduce(function(a, b) {
+        return conteo[a] > conteo[b] ? a : b;
+    }, "");
+
+    var maxPrecio = figuritas.reduce(function(max, f) {
+        return f.precio > max ? f.precio : max;
+    }, 0);
+
+    var promedio = figuritas.reduce(function(suma, f) {
+        return suma + f.precio;
+    }, 0) / total;
+
+    document.getElementById("statTotal").textContent = total;
+    document.getElementById("statPais").textContent = paisModa;
+    document.getElementById("statMax").textContent = "$" + maxPrecio;
+    document.getElementById("statProm").textContent = "$" + promedio.toFixed(2);
 }
 
 function exportarCSV() {
+    var csv = "Nombre,Pais,Precio,ID\n";
+    for (var i = 0; i < figuritas.length; i++) {
+        csv += figuritas[i].nombre + "," + figuritas[i].pais + "," + figuritas[i].precio + "," + figuritas[i]._id + "\n";
+    }
+    var blob = new Blob([csv], { type: "text/csv" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "figuritas.csv";
+    a.click();
 }
 
 function mostrarTab(id) {
@@ -360,7 +395,12 @@ function mostrarTab(id) {
 }
 
 function toggleTema() {
+    var tema = document.body.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
+    document.body.setAttribute("data-bs-theme", tema);
+    localStorage.setItem("tema", tema);
 }
 
 function cargarTemaGuardado() {
+    var tema = localStorage.getItem("tema");
+    if (tema) document.body.setAttribute("data-bs-theme", tema);
 }
