@@ -13,8 +13,8 @@
 }
 
 /* TODO: Hover de tarjeta */
-.figurita-card:hover {
-  /* transform, box-shadow, border-color */
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 /* TODO: Tarjeta seleccionada */

@@ -353,6 +353,12 @@ function estadisticas() {
 function exportarCSV() {
 }
 
+function mostrarTab(id) {
+    var tabEl = document.querySelector('[data-bs-target="#' + id + '"]');
+    new bootstrap.Tab(tabEl).show();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 function toggleTema() {
 }
 
