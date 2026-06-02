@@ -52,29 +52,30 @@ function mostrarFiguritas() {
     document.getElementById("contenedorFiguritas").innerHTML = html;
     document.getElementById("infoPagina").textContent = "Página " + pagina + " de " + totalPaginas;
 }
-
+//profe te devuelve una ruta relativa 
 function crearCard(fig) {
-    var claseSeleccionada = fig.id == idSeleccionado ? " border border-primary border-2" : "";
-    var imagen = fig.imagen ? fig.imagen : "./img/copa.jpg";
-    var bandera = banderas[fig.pais] ? banderas[fig.pais] : "";
-    return '<div class="col">' +
-        '<div class="card h-100' + claseSeleccionada + '">' +
-        '<img src="' + imagen + '" class="card-img-top" style="height:180px; object-fit:cover;" onerror="this.src=\'./img/copa.jpg\'">' +
-        '<div class="card-body">' +
-        '<h6 class="card-title">' + fig.nombre + '</h6>' +
-        '<p class="card-text mb-1">' + bandera + ' <span class="badge bg-info text-dark">' + fig.pais + '</span></p>' +
-        '<p class="card-text mb-1 fw-bold">$' + fig.precio + '</p>' +
-        '<p class="card-text text-muted small">ID: ' + fig.id + '</p>' +
-        '</div>' +
-        '<div class="card-footer d-flex gap-2">' +
-        '<button class="btn btn-primary btn-sm" onclick="seleccionar(' + fig.id + ')"><i class="bi bi-pencil-square"></i> Seleccionar</button>' +
-        '<button class="btn btn-danger btn-sm" onclick="eliminarDirecto(' + fig.id + ')"><i class="bi bi-trash"></i> Eliminar</button>' +
-        '</div>' +
-        '</div>' +
-        '</div>';
+    var seleccionada = fig._id == idSeleccionado ? "border border-primary border-2" : "";
+    var bandera = banderas[fig.pais] || "";
+    return `
+        <div class="col">
+            <div class="card h-100 ${seleccionada}">
+                <img src="https://figuritas-api.onrender.com/${fig.imagen}" class="card-img-top" style="height:180px;object-fit:cover">
+                <div class="card-body">
+                    <h6>${fig.nombre}</h6>
+                    <p>${bandera} ${fig.pais}</p>
+                    <p>$${fig.precio}</p>
+                    <small class="text-muted">ID: ${fig._id}</small>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary btn-sm me-1" onclick="seleccionar('${fig._id}')"><i class="bi bi-pencil-square"></i> Seleccionar</button>
+                    <button class="btn btn-danger btn-sm" onclick="eliminarDirecto('${fig._id}')"><i class="bi bi-trash"></i> Eliminar</button>
+                </div>
+            </div>
+        </div>`;
 }
 
 function guardar() {
+    console.log("guardar llamado");
     if (!validar(true)) return;
     var formData = new FormData();
     formData.append("nombre", document.getElementById("txtNombre").value.trim());
