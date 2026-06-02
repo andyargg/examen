@@ -2,6 +2,7 @@ var figuritas = [];
 var filtradas = [];
 var pagina = 1;
 var idSeleccionado = null;
+var ordenAsc = true;
 
 var banderas = {
     "Argentina": "🇦🇷",
@@ -27,6 +28,14 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     document.getElementById("fileImagen").addEventListener("change", preview);
+    var colBotones = document.querySelector("#tab-listado .col-md-5");
+    colBotones.querySelector(".btn-primary").addEventListener("click", filtrar);
+    colBotones.querySelector(".btn-outline-secondary").addEventListener("click", limpiarFiltros);
+    colBotones.querySelector(".btn-outline-info").addEventListener("click", ordenar);
+    colBotones.querySelector(".btn-outline-success").addEventListener("click", promedio);
+    var btnsPag = document.querySelectorAll("#tab-listado .justify-content-center .btn-outline-secondary");
+    btnsPag[0].addEventListener("click", function() { cambiarPagina(-1); });
+    btnsPag[1].addEventListener("click", function() { cambiarPagina(1); });
     limpiar();
     obtenerFiguritas();
 });
@@ -61,7 +70,6 @@ function mostrarFiguritas() {
     document.getElementById("contenedorFiguritas").innerHTML = html;
     document.getElementById("infoPagina").textContent = "Página " + pagina + " de " + totalPaginas;
 }
-//profe te devuelve una ruta relativa 
 function crearCard(fig) {
     var seleccionada = fig._id == idSeleccionado ? "border border-primary border-2" : "";
     var bandera = banderas[fig.pais] || "";
@@ -276,18 +284,55 @@ function ocultarSpinner() {
 }
 
 function filtrar() {
+    var nombre = document.getElementById("txtBuscar").value.trim().toLowerCase();
+    var pais = document.getElementById("filtroPais").value;
+    filtradas = [];
+    for (var i = 0; i < figuritas.length; i++) {
+        var coincideNombre = figuritas[i].nombre.toLowerCase().includes(nombre);
+        var coincidePais = pais === "todos" || figuritas[i].pais === pais;
+        if (coincideNombre && coincidePais) {
+            filtradas.push(figuritas[i]);
+        }
+    }
+    pagina = 1;
+    mostrarFiguritas();
 }
 
 function limpiarFiltros() {
+    document.getElementById("txtBuscar").value = "";
+    document.getElementById("filtroPais").value = "todos";
+    filtradas = figuritas;
+    pagina = 1;
+    mostrarFiguritas();
 }
 
 function ordenar() {
+    filtradas.sort(function(a, b) {
+        return ordenAsc ? a.precio - b.precio : b.precio - a.precio;
+    });
+    ordenAsc = !ordenAsc;
+    mostrarFiguritas();
 }
 
 function promedio() {
+    if (filtradas.length === 0) {
+        alert("No hay figuritas para calcular");
+        return;
+    }
+    var suma = 0;
+    for (var i = 0; i < filtradas.length; i++) {
+        suma += filtradas[i].precio;
+    }
+    alert("Precio promedio de figus: $" + (suma / filtradas.length).toFixed(2));
 }
 
 function cambiarPagina(dir) {
+    var totalPaginas = Math.ceil(filtradas.length / ITEMS_POR_PAGINA);
+    if (totalPaginas === 0) totalPaginas = 1;
+    pagina += dir;
+    if (pagina < 1) pagina = 1;
+    if (pagina > totalPaginas) pagina = totalPaginas;
+    mostrarFiguritas();
 }
 
 function alerta(mensaje, tipo) {
