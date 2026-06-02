@@ -1,0 +1,52 @@
+/* Estilos Figuritas Mundial 2026 */
+
+/* TODO: Navbar con color UTN */
+.navbar {
+  /* background: ... */
+}
+
+/* TODO: Tarjeta de figurita */
+.figurita-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+/* TODO: Hover de tarjeta */
+.figurita-card:hover {
+  /* transform, box-shadow, border-color */
+}
+
+/* TODO: Tarjeta seleccionada */
+.figurita-card.seleccionada {
+  /* border y fondo distintivo */
+}
+
+/* TODO: Imagen de tarjeta */
+.figurita-card img {
+  /* height, object-fit */
+}
+
+/* TODO: Campo válido (verde) */
+.is-valid {
+  /* border-color verde */
+}
+
+/* TODO: Campo inválido (rojo) */
+.is-invalid {
+  /* border-color rojo */
+}
+
+/* TODO: Animación de alertas */
+.alert {
+  /* animation */
+}
+
+/* TODO: Modo oscuro */
+[data-bs-theme="dark"] .bg-light {
+  /* fondo oscuro */
+}
+
+[data-bs-theme="dark"] .card {
+  /* fondo y borde oscuro */
+}
